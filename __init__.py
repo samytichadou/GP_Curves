@@ -35,6 +35,7 @@ bl_info = {
 from . import   (
     properties,
     gui,
+    curves_handler,
 )
 
 
@@ -44,7 +45,9 @@ from . import   (
 def register():
     properties.register()
     gui.register()
+    curves_handler.register()
 
 def unregister():
     properties.unregister()
     gui.unregister()
+    curves_handler.unregister()

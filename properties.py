@@ -6,7 +6,16 @@ class GPCURVES_PR_gp_properties(bpy.types.PropertyGroup):
 
 class GPCURVES_PR_curve_properties(bpy.types.PropertyGroup):
     is_gpcurves: bpy.props.BoolProperty(name="GP Curves")
-    gp: bpy.props.PointerProperty(type = bpy.types.GreasePencil, name="Grease Pencil Object")
+    gp: bpy.props.PointerProperty(type = bpy.types.GreasePencil, name="Grease Pencil")
+    layer_mode: bpy.props.EnumProperty(
+            name="Layer Mode",
+            items=(
+                ('ALL', 'All', ""),
+                ('ALL_RENDERED', 'All Rendered', ""),
+                ('SPECIFIC', 'Specific', ""),
+                ),
+        )
+    specific_layer_name: bpy.props.StringProperty(name="Specific Layer Name")
 
 
 ### REGISTER ---
