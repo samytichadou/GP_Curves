@@ -60,7 +60,6 @@ def gp_curve_handler(scene):
                     create_curves_from_gp_active_frame(ob, props.gp)
 
 
-
 ### REGISTER ---
 
 def register():
