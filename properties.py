@@ -9,7 +9,7 @@ class GPCURVES_PR_curve_properties(bpy.types.PropertyGroup):
             items=(
                 ('ALL', 'All', ""),
                 ('ALL_RENDERED', 'All Rendered', ""),
-                ('SPECIFIC', 'Specific', ""),
+                ('SPECIFICS', 'Specifics', ""),
                 ),
         )
     specific_layers: bpy.props.StringProperty(name="Specific Layers")

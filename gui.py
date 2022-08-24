@@ -39,7 +39,7 @@ class GPCURVES_PT_curve_panel(bpy.types.Panel):
         layout.prop(props, "gp")
         layout.prop(props, "layer_mode")
         sub=layout.row()
-        if not props.layer_mode=="SPECIFIC":
+        if not props.layer_mode=="SPECIFICS":
             sub.enabled=False
         sub.prop(props, "specific_layers")
 

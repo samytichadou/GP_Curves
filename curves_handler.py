@@ -28,7 +28,7 @@ def get_layer_list(curve_object, gp_object):
         for layer in gp_object.layers:
             if not layer.hide:
                 layer_list.append(layer)
-    elif curve_props.layer_mode=="SPECIFIC":
+    elif curve_props.layer_mode=="SPECIFICS":
         specifics=curve_props.specific_layers.split(",")
         for layer in gp_object.layers:
             if layer.info in specifics:
