@@ -29,10 +29,10 @@ def get_layer_list(curve_object, gp_object):
             if not layer.hide:
                 layer_list.append(layer)
     elif curve_props.layer_mode=="SPECIFIC":
-        try:
-            layer_list.append(gp_object.layers[curve_props.specific_layer_name])
-        except KeyError:
-            pass
+        specifics=curve_props.specific_layers.split(",")
+        for layer in gp_object.layers:
+            if layer.info in specifics:
+                layer_list.append(layer)
     
     return layer_list
 
@@ -43,8 +43,11 @@ def create_curves_from_gp_active_frame(curve_object, gp_object):
 
     # Create splines
     for layer in layer_list:
-        for stroke in layer.active_frame.strokes:
-            create_spline_from_stroke(curve_object, stroke)
+        if layer.active_frame is not None:
+            for stroke in layer.active_frame.strokes:
+                create_spline_from_stroke(curve_object, stroke)
+                curve_object.update_tag()
+
 
 @persistent
 def gp_curve_handler(scene):
