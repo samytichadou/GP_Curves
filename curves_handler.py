@@ -51,7 +51,6 @@ def create_curves_from_gp_active_frame(curve_object, gp_object):
 
 @persistent
 def gp_curve_handler(scene):
-    print("handler")
     for ob in scene.objects:
         if ob.type=="CURVE":
             props=ob.data.gpcurves_props
