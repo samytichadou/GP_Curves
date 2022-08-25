@@ -1,6 +1,7 @@
 # GP_Curves
 
 TODO  
-- handler toggler
-- layer selector from curve
-- bake operator logic
+- [x] handler toggler
+- [x] layer selector from curve
+- [-] bake operator logic
+- [-] descriptions for op and props
