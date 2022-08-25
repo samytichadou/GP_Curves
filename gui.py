@@ -43,6 +43,8 @@ class GPCURVES_PT_curve_panel(bpy.types.Panel):
             sub.enabled=False
         sub.prop(props, "specific_layers")
 
+        layout.prop(context.scene.gpcurves_scene_props, "gpcurves_process")
+
 
 ### REGISTER ---
 def register():
