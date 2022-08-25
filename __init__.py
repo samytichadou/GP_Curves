@@ -37,6 +37,7 @@ from . import   (
     gui,
     curves_handler,
     layer_selector_operator,
+    bake_operator,
 )
 
 
@@ -48,9 +49,11 @@ def register():
     gui.register()
     curves_handler.register()
     layer_selector_operator.register()
+    bake_operator.register()
 
 def unregister():
     properties.unregister()
     gui.unregister()
     curves_handler.unregister()
     layer_selector_operator.unregister()
+    bake_operator.unregister()

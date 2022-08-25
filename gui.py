@@ -19,12 +19,13 @@ class GPCURVES_PT_gp_panel(bpy.types.Panel):
         layout = self.layout 
 
         layout.prop(props, "bake_collection", text="Collection")
-        layout.prop(props, "bake_layer_mode", text="Mode")
+        layout.prop(props, "layer_mode", text="Mode")
         sub=layout.row(align=True)
-        if not props.bake_layer_mode=="SPECIFICS":
+        if not props.layer_mode=="SPECIFICS":
             sub.enabled=False
-        sub.prop(props, "bake_specific_layers", text="Layer(s)")
-        layout.label(text="Bake GP Curves placeholder")
+        sub.prop(props, "specific_layers", text="Layer(s)")
+        layout.operator("gpcurves.bake_gp_curves")
+        layout.prop(props, "bake_hash")
 
 
 class GPCURVES_PT_curve_panel(bpy.types.Panel):
@@ -57,6 +58,7 @@ class GPCURVES_PT_curve_panel(bpy.types.Panel):
             sub.enabled=False
         sub.prop(props, "specific_layers", text="Layer(s)")
         sub.operator("gpcurves.add_layer_menu_caller", text="", icon="ADD")
+        layout.prop(props, "bake_hash")
 
 
 # auto profile topbar

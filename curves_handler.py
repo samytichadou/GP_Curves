@@ -18,19 +18,17 @@ def create_spline_from_stroke(curve_object, stroke):
         spline.points[n].co=(*point.co, 1)
         n+=1
 
-def get_layer_list(curve_object, gp_object):
-    curve_props=curve_object.data.gpcurves_curve_props
-
+def get_layer_list(props, gp_object):
     # Create layer list
     layer_list=[]
-    if curve_props.layer_mode=="ALL":
+    if props.layer_mode=="ALL":
         layer_list=gp_object.layers
-    elif curve_props.layer_mode=="ALL_RENDERED":
+    elif props.layer_mode=="ALL_RENDERED":
         for layer in gp_object.layers:
             if not layer.hide:
                 layer_list.append(layer)
-    elif curve_props.layer_mode=="SPECIFICS":
-        specifics=curve_props.specific_layers.split(",")
+    elif props.layer_mode=="SPECIFICS":
+        specifics=props.specific_layers.split(",")
         for layer in gp_object.layers:
             if layer.info in specifics:
                 layer_list.append(layer)
@@ -40,7 +38,7 @@ def get_layer_list(curve_object, gp_object):
 def create_curves_from_gp_active_frame(curve_object, gp_object, frame):
     remove_existing_splines(curve_object)
 
-    layer_list=get_layer_list(curve_object, gp_object)
+    layer_list=get_layer_list(curve_object.data.gpcurves_curve_props, gp_object)
 
     # Create splines
     for layer in layer_list:
@@ -56,7 +54,7 @@ def gp_curve_handler(scene):
     for ob in scene.objects:
         if ob.type=="CURVE":
             props=ob.data.gpcurves_curve_props
-            if props.is_gpcurves:
+            if props.is_gpcurves and not props.bake_hash:
                 if props.gp:
                     print("curving from %s to %s" % (props.gp.name, ob.name))
                     create_curves_from_gp_active_frame(ob, props.gp, scene.frame_current)
