@@ -1,5 +1,6 @@
 import bpy
 from bpy.app.handlers import persistent
+import time
 
 
 def remove_existing_splines(curve_object):
@@ -51,6 +52,7 @@ def create_curves_from_gp_active_frame(curve_object, gp_object):
 
 @persistent
 def gp_curve_handler(scene):
+    start=time.time()
     for ob in scene.objects:
         if ob.type=="CURVE":
             props=ob.data.gpcurves_props
@@ -58,6 +60,9 @@ def gp_curve_handler(scene):
                 if props.gp:
                     print("curving from %s to %s" % (props.gp.name, ob.name))
                     create_curves_from_gp_active_frame(ob, props.gp)
+    end=time.time()
+    exec_time=end-start
+    print("handler executed in : %f" % exec_time)
 
 
 ### REGISTER ---
