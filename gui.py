@@ -25,8 +25,11 @@ class GPCURVES_PT_gp_panel(bpy.types.Panel):
             sub.enabled=False
         sub.prop(props, "specific_layers", text="Layer(s)")
         layout.operator("gpcurves.bake_gp_curves")
-        layout.prop(props, "bake_hash")
-
+        layout.operator("gpcurves.remove_bake")
+        if props.bake_hash:
+            layout.label(text="Bake Hash : %s"% props.bake_hash)
+        else:
+            layout.label(text="No bake")
 
 class GPCURVES_PT_curve_panel(bpy.types.Panel):
     bl_space_type = 'PROPERTIES'
@@ -42,15 +45,23 @@ class GPCURVES_PT_curve_panel(bpy.types.Panel):
     def draw_header(self, context):
         ob = context.object
         props = ob.data.gpcurves_curve_props
-        self.layout.prop(props, "is_gpcurves", text="")
+        if not props.bake_hash:
+            self.layout.prop(props, "is_gpcurves", text="")
+        else:
+            self.layout.label(text="", icon="OUTLINER_OB_GREASEPENCIL")
 
     def draw(self, context):
         ob = context.object
         props = ob.data.gpcurves_curve_props
 
         layout = self.layout
-        layout.active = props.is_gpcurves
+        if props.is_gpcurves or props.bake_hash:
+            layout.active
 
+        if props.bake_hash:
+            layout.label(text="Baked from : %s" % props.gp.name)
+            layout.label(text="Hash : %s" % props.bake_hash)
+            return
         layout.prop(props, "gp", text="GP Datas")
         layout.prop(props, "layer_mode", text="Mode")
         sub=layout.row(align=True)
@@ -58,7 +69,6 @@ class GPCURVES_PT_curve_panel(bpy.types.Panel):
             sub.enabled=False
         sub.prop(props, "specific_layers", text="Layer(s)")
         sub.operator("gpcurves.add_layer_menu_caller", text="", icon="ADD")
-        layout.prop(props, "bake_hash")
 
 
 # auto profile topbar
