@@ -178,6 +178,8 @@ class GPCURVES_OT_remove_bake(bpy.types.Operator):
     bl_label = "Remove Bake"
     bl_options = {'REGISTER','UNDO','INTERNAL'}
 
+    remove_collection: bpy.props.BoolProperty(name="Remove Bake Collection if Empty", default=True)
+
     @classmethod
     def poll(cls, context):
         ob = context.object
@@ -185,12 +187,29 @@ class GPCURVES_OT_remove_bake(bpy.types.Operator):
             if ob.data.gpcurves_gp_props.bake_hash:
                 return True
 
+    def invoke(self, context, event):        
+        return context.window_manager.invoke_props_dialog(self)
+
+    def draw(self, context):
+        ob = context.object
+        props = ob.data.gpcurves_gp_props
+
+        layout = self.layout
+
+        layout.label(text="Previous Collection : %s" % props.bake_collection.name)
+        layout.prop(self, "remove_collection")
+        layout.separator
+        layout.label(text="Remove Bake ?")
+
     def execute(self, context):
         ob=context.object
         props=ob.data.gpcurves_gp_props
-        hash=props.bake_hash
 
-        remove_bake(hash)
+        remove_bake(props.bake_hash)
+
+        if self.remove_collection:
+            if props.bake_hash and props.bake_collection:
+                remove_collection_if_empty(props.bake_collection)
 
         props.bake_hash=""
 
