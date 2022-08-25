@@ -18,18 +18,29 @@ class GPCURVES_PT_gp_panel(bpy.types.Panel):
 
         layout = self.layout 
 
-        layout.prop(props, "bake_collection", text="Collection")
-        layout.prop(props, "layer_mode", text="Mode")
-        sub=layout.row(align=True)
-        if not props.layer_mode=="SPECIFICS":
-            sub.enabled=False
-        sub.prop(props, "specific_layers", text="Layer(s)")
         layout.operator("gpcurves.bake_gp_curves")
         layout.operator("gpcurves.remove_bake")
+
+        box=layout.box()
         if props.bake_hash:
-            layout.label(text="Bake Hash : %s"% props.bake_hash)
+            col=box.column(align=True)
+            col.label(text="Previous Bake", icon="INFO")
+            col.label(text="Hash : %s" % props.bake_hash)
+            col.label(text="Collection : %s" % props.bake_collection.name)
+            if props.layer_mode=="ALL":
+                layers="All"
+            elif props.layer_mode=="VISIBLE":
+                layers="Only Visibles"
+            else:
+                layers=props.specific_layers
+            col.label(text="Layers : %s" % layers)
         else:
-            layout.label(text="No bake")
+            box.label(text="No Bake", icon="INFO")
+
+        # sub=layout.row(align=True)
+        # if not props.layer_mode=="SPECIFICS":
+        #     sub.enabled=False
+        # sub.prop(props, "specific_layers", text="Layer(s)")
 
 class GPCURVES_PT_curve_panel(bpy.types.Panel):
     bl_space_type = 'PROPERTIES'

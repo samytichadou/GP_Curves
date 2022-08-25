@@ -16,14 +16,15 @@ def gpcurves_process_update(self, context):
 
 class GPCURVES_PR_greasepencil_properties(bpy.types.PropertyGroup):
     bake_collection: bpy.props.PointerProperty(type = bpy.types.Collection, name="Baked Curves Collection")
+    temp_bake_collection: bpy.props.PointerProperty(type = bpy.types.Collection, name="Baked Curves Collection")
     layer_mode: bpy.props.EnumProperty(
-            name="Layer Mode",
-            items=(
-                ('ALL', 'All GP Layers', ""),
-                ('VISIBLE', 'Only Visible GP Layers', ""),
-                ('SPECIFICS', 'Specific(s) GP layer(s)', ""),
-                ),
-        )
+        name="Layer Mode",
+        items=(
+            ('ALL', 'All GP Layers', ""),
+            ('VISIBLE', 'Only Visible GP Layers', ""),
+            ('SPECIFICS', 'Specific(s) GP layer(s)', ""),
+            ),
+    )
     specific_layers: bpy.props.StringProperty(
         name="Specific Layers",
         description="GP Layer(s) name(s) separated by comma",    

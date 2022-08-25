@@ -97,6 +97,20 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
         )
     new_collection_name: bpy.props.StringProperty(name="New Collection Name")
     remove_previous_collection: bpy.props.BoolProperty(name="Remove Previous Collection if Empty", default=True)
+
+    layer_mode: bpy.props.EnumProperty(
+        name="Layer Mode",
+        items=(
+            ('ALL', 'All GP Layers', ""),
+            ('VISIBLE', 'Only Visible GP Layers', ""),
+            ('SPECIFICS', 'Specific(s) GP layer(s)', ""),
+            ),
+    )
+    specific_layers: bpy.props.StringProperty(
+        name="Specific Layers",
+        description="GP Layer(s) name(s) separated by comma",    
+    )
+
     temp_hash=""
     temp_name=""
 
@@ -108,6 +122,8 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
     def invoke(self, context, event):
         ob = context.object
         props = ob.data.gpcurves_gp_props
+
+        props.temp_bake_collection=props.bake_collection
 
         self.temp_hash=generate_random()
         self.temp_name=self.new_collection_name="%s_%s_%s" % (bake_name, ob.name, self.temp_hash)
@@ -123,10 +139,13 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
         if props.bake_hash and props.bake_collection:
             box=layout.box()
             col=box.column(align=True)
-            col.label(text="Previous Bake", icon="INFO")
+            col.label(text="Previous Bake to remove", icon="INFO")
             col.label(text="Hash : %s" % props.bake_hash)
             col.label(text="Collection : %s" % props.bake_collection.name)
-            col.prop(self, "remove_previous_collection")
+            sub=col.row()
+            if self.collection_mode=="EXISTING" and props.temp_bake_collection==props.bake_collection:
+                sub.enabled=False
+            sub.prop(self, "remove_previous_collection")
 
         layout.separator()
 
@@ -134,15 +153,15 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
         if self.collection_mode=="NEW":
             layout.prop(self, "new_collection_name", text="", icon="COLLECTION_NEW")
         else:
-            layout.prop(props, "bake_collection", text="")
+            layout.prop(props, "temp_bake_collection", text="")
 
         layout.separator()
 
-        layout.prop(props, "layer_mode", text="Mode")
+        layout.prop(self, "layer_mode", text="Mode")
         sub=layout.row(align=True)
-        if not props.layer_mode=="SPECIFICS":
+        if not self.layer_mode=="SPECIFICS":
             sub.enabled=False
-        sub.prop(props, "specific_layers", text="Layer(s)")
+        sub.prop(self, "specific_layers", text="Layer(s)")
 
     def execute(self, context):
         ob = context.object
@@ -153,7 +172,14 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
             remove_bake(props.bake_hash)
         if self.remove_previous_collection:
             if props.bake_hash and props.bake_collection:
-                remove_collection_if_empty(props.bake_collection)
+                if self.collection_mode!="EXISTING"\
+                or props.bake_collection!=props.temp_bake_collection:
+                    remove_collection_if_empty(props.bake_collection)
+
+        # Pass new properties
+        props.bake_collection=props.temp_bake_collection
+        props.layer_mode=self.layer_mode
+        props.specific_layers=self.specific_layers
 
         # New hash
         props.bake_hash=self.temp_hash
