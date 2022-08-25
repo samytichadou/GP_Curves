@@ -20,7 +20,7 @@ class GPCURVES_PR_greasepencil_properties(bpy.types.PropertyGroup):
             name="Layer Mode",
             items=(
                 ('ALL', 'All GP Layers', ""),
-                ('ALL_RENDERED', 'All Rendered GP Layers', ""),
+                ('VISIBLE', 'Only Visible GP Layers', ""),
                 ('SPECIFICS', 'Specific(s) GP layer(s)', ""),
                 ),
         )
@@ -28,7 +28,7 @@ class GPCURVES_PR_greasepencil_properties(bpy.types.PropertyGroup):
         name="Specific Layers",
         description="GP Layer(s) name(s) separated by comma",    
     )
-    
+
     bake_hash: bpy.props.StringProperty(name="Bake Hash")
 
 class GPCURVES_PR_curve_properties(bpy.types.PropertyGroup):
@@ -38,7 +38,7 @@ class GPCURVES_PR_curve_properties(bpy.types.PropertyGroup):
             name="Layer Mode",
             items=(
                 ('ALL', 'All GP Layers', ""),
-                ('ALL_RENDERED', 'All Rendered GP Layers', ""),
+                ('VISIBLE', 'Only Visible GP Layers', ""),
                 ('SPECIFICS', 'Specific(s) GP layer(s)', ""),
                 ),
         )

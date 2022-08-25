@@ -90,17 +90,55 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
     bl_label = "Bake GP to Curves"
     bl_options = {'REGISTER','UNDO','INTERNAL'}
 
+    collection_mode: bpy.props.EnumProperty(
+            name="Collection Mode",
+            items=(
+                ('NEW', 'Create New Collection', ""),
+                ('EXISTING', 'Use Existing Collection', ""),
+                ),
+        )
+    new_collection_name: bpy.props.StringProperty(name="New Collection Name")
+
     @classmethod
     def poll(cls, context):
         ob = context.object
         return ob and ob.type == 'GPENCIL'
 
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self)
+
+    def draw(self, context):
+        ob = context.object
+        props = ob.data.gpcurves_gp_props
+
+        layout = self.layout
+
+        layout.prop(self, "collection_mode", text="")
+        if self.collection_mode=="NEW":
+            layout.prop(self, "new_collection_name", text="", icon="OUTLINER_COLLECTION")
+        else:
+            layout.prop(props, "bake_collection", text="")
+
+        layout.separator()
+
+        layout.prop(props, "layer_mode", text="Mode")
+        sub=layout.row(align=True)
+        if not props.layer_mode=="SPECIFICS":
+            sub.enabled=False
+        sub.prop(props, "specific_layers", text="Layer(s)")
+
     def execute(self, context):
         ob = context.object
         props = ob.data.gpcurves_gp_props
+
+        # Remove previous
+        if props.bake_hash:
+            remove_bake(props.bake_hash)
+
         props.bake_hash=generate_random()
         bake_gp_to_curves(ob.data, props.bake_collection, context.scene)
         return {'FINISHED'}
+
 
 class GPCURVES_OT_remove_bake(bpy.types.Operator):
     bl_idname = "gpcurves.remove_bake"

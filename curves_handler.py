@@ -23,7 +23,7 @@ def get_layer_list(props, gp_object):
     layer_list=[]
     if props.layer_mode=="ALL":
         layer_list=gp_object.layers
-    elif props.layer_mode=="ALL_RENDERED":
+    elif props.layer_mode=="VISIBLE":
         for layer in gp_object.layers:
             if not layer.hide:
                 layer_list.append(layer)
