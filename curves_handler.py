@@ -19,7 +19,7 @@ def create_spline_from_stroke(curve_object, stroke):
         n+=1
 
 def get_layer_list(curve_object, gp_object):
-    curve_props=curve_object.data.gpcurves_props
+    curve_props=curve_object.data.gpcurves_curve_props
 
     # Create layer list
     layer_list=[]
@@ -55,7 +55,7 @@ def gp_curve_handler(scene):
     start=time.time()
     for ob in scene.objects:
         if ob.type=="CURVE":
-            props=ob.data.gpcurves_props
+            props=ob.data.gpcurves_curve_props
             if props.is_gpcurves:
                 if props.gp:
                     print("curving from %s to %s" % (props.gp.name, ob.name))

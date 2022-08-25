@@ -32,12 +32,12 @@ class GPCURVES_PT_curve_panel(bpy.types.Panel):
 
     def draw_header(self, context):
         ob = context.object
-        props = ob.data.gpcurves_props
+        props = ob.data.gpcurves_curve_props
         self.layout.prop(props, "is_gpcurves", text="")
 
     def draw(self, context):
         ob = context.object
-        props = ob.data.gpcurves_props
+        props = ob.data.gpcurves_curve_props
 
         layout = self.layout
         layout.active = props.is_gpcurves

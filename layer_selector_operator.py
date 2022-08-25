@@ -6,7 +6,7 @@ class GPCURVES_MT_add_layer_menu(bpy.types.Menu):
 
     def draw(self, context):
         ob = context.object
-        props = ob.data.gpcurves_props
+        props = ob.data.gpcurves_curve_props
         gp = props.gp
         layer_list = props.specific_layers.split(",")
 
@@ -27,7 +27,7 @@ class GPCURVES_OT_add_layer_menu_caller(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         ob = context.object
-        gp = ob.data.gpcurves_props.gp
+        gp = ob.data.gpcurves_curve_props.gp
         return ob and gp
 
     def execute(self, context):
@@ -47,7 +47,7 @@ class GPCURVES_OT_add_layer(bpy.types.Operator):
 
     def execute(self, context):
         ob = context.object
-        props = ob.data.gpcurves_props
+        props = ob.data.gpcurves_curve_props
         layer_field = props.specific_layers
 
         if layer_field and not layer_field.strip().endswith(","):
