@@ -37,7 +37,7 @@ class GPCURVES_OT_add_layer_menu_caller(bpy.types.Operator):
 class GPCURVES_OT_add_layer(bpy.types.Operator):
     bl_idname = "gpcurves.add_layer"
     bl_label = "Add this Layer"
-    bl_options = {'REGISTER', 'INTERNAL'}
+    bl_options = {'REGISTER','UNDO','INTERNAL'}
 
     layer_name : bpy.props.StringProperty()
 
