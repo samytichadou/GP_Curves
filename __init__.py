@@ -20,13 +20,13 @@ Created by Samy Tichadou
 
 bl_info = {
     "name": "GP Curves",
-    "description": "Manage several modifiers quickly",
+    "description": "Link 3D Curve to Grease Pencil animated datas",
     "author": "Samy Tichadou (tonton)",
     "version": (0, 1, 0),
     "blender": (3, 0, 0),
     "location": "",
-    "wiki_url": "https://github.com/samytichadou/modifier_helper/blob/master/README.md",
-    "tracker_url": "https://github.com/samytichadou/modifier_helper/issues/new",
+    "wiki_url": "https://github.com/samytichadou/GP_Curves/blob/master/README.md",
+    "tracker_url": "https://github.com/samytichadou/GP_Curves/issues/new",
     "category": "Animation" }
 
 # IMPORT SPECIFICS
