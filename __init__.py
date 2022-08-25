@@ -19,7 +19,7 @@ Created by Samy Tichadou
 '''
 
 bl_info = {
-    "name": "Grease Pencil Curves",
+    "name": "GP Curves",
     "description": "Manage several modifiers quickly",
     "author": "Samy Tichadou (tonton)",
     "version": (0, 1, 0),
