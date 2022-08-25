@@ -20,9 +20,9 @@ class GPCURVES_PR_curve_properties(bpy.types.PropertyGroup):
     layer_mode: bpy.props.EnumProperty(
             name="Layer Mode",
             items=(
-                ('ALL', 'All', ""),
-                ('ALL_RENDERED', 'All Rendered', ""),
-                ('SPECIFICS', 'Specifics', ""),
+                ('ALL', 'All GP Layers', ""),
+                ('ALL_RENDERED', 'All Rendered GP Layers', ""),
+                ('SPECIFICS', 'Specific(s) GP layer(s)', ""),
                 ),
         )
     specific_layers: bpy.props.StringProperty(
