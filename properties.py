@@ -55,7 +55,7 @@ def register():
     bpy.utils.register_class(GPCURVES_PR_curve_properties)
     bpy.utils.register_class(GPCURVES_PR_scene_properties)
     bpy.types.GreasePencil.gpcurves_gp_props = \
-        bpy.props.PointerProperty(type = GPCURVES_PR_curve_properties, name="GP Grease Pencil Properties")
+        bpy.props.PointerProperty(type = GPCURVES_PR_greasepencil_properties, name="GP Grease Pencil Properties")
     bpy.types.Curve.gpcurves_curve_props = \
         bpy.props.PointerProperty(type = GPCURVES_PR_curve_properties, name="GP Curves Properties")
     bpy.types.Scene.gpcurves_scene_props = \

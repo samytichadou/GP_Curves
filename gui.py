@@ -14,8 +14,16 @@ class GPCURVES_PT_gp_panel(bpy.types.Panel):
 
     def draw(self, context):
         ob = context.object
+        props = ob.data.gpcurves_gp_props
 
-        layout = self.layout
+        layout = self.layout 
+
+        layout.prop(props, "bake_collection", text="Collection")
+        layout.prop(props, "bake_layer_mode", text="Mode")
+        sub=layout.row(align=True)
+        if not props.bake_layer_mode=="SPECIFICS":
+            sub.enabled=False
+        sub.prop(props, "bake_specific_layers", text="Layer(s)")
         layout.label(text="Bake GP Curves placeholder")
 
 
