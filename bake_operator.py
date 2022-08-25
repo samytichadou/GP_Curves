@@ -3,6 +3,8 @@ import random
 
 from . import curves_handler as c_h
 
+bake_name="GP_Curves_Bake"
+
 def generate_random():
     return(str(random.randrange(0,99999)).zfill(5))
 
@@ -16,10 +18,20 @@ def create_curve_object(name, collection):
     collection.objects.link(new_object)
     return new_object
 
+def create_hide_keyframes(ob, hide, group):
+    ob.hide_viewport=ob.hide_render=hide
+    ob.keyframe_insert(
+        data_path='hide_viewport',
+        group=group,
+    )
+    ob.keyframe_insert(
+        data_path='hide_render',
+        group=group,
+    )
+
 def bake_gp_to_curves(gp_datas, target_coll, scene):
     gp_name=gp_datas.name
     props=gp_datas.gpcurves_gp_props
-    group="GP Curves Bake"
 
     layer_list=c_h.get_layer_list(props, gp_datas)
 
@@ -43,39 +55,15 @@ def bake_gp_to_curves(gp_datas, target_coll, scene):
             # Keyframe start
             if frame.frame_number>scene.frame_start:
                 scene.frame_current=scene.frame_start
-            new_object.hide_viewport=new_object.hide_render=True
-            new_object.keyframe_insert(
-                data_path='hide_viewport',
-                group=group,
-            )
-            new_object.keyframe_insert(
-                data_path='hide_render',
-                group=group,
-            )
+            create_hide_keyframes(new_object, True, bake_name)
 
             # Keyframe Previous object
             scene.frame_current=frame.frame_number
             if previous_object:
-                previous_object.hide_viewport=previous_object.hide_render=True
-                previous_object.keyframe_insert(
-                    data_path='hide_viewport',
-                    group=group,
-                )
-                previous_object.keyframe_insert(
-                    data_path='hide_render',
-                    group=group,
-                )
+                create_hide_keyframes(previous_object, True, bake_name)
             
             # Keyframe end
-            new_object.hide_viewport=new_object.hide_render=False
-            new_object.keyframe_insert(
-                data_path='hide_viewport',
-                group=group,
-            )
-            new_object.keyframe_insert(
-                data_path='hide_render',
-                group=group,
-            )
+            create_hide_keyframes(new_object, False, bake_name)
             previous_object=new_object
 
 def remove_bake(hash):
@@ -84,6 +72,16 @@ def remove_bake(hash):
             if ob.data.gpcurves_curve_props.bake_hash==hash:
                 bpy.data.objects.remove(ob, do_unlink=True)
 
+def remove_collection_if_empty(coll):
+    if not coll.objects:
+        bpy.data.collections.remove(coll)
+        return True
+    return False
+
+def create_collection(name, scene):
+    coll=bpy.data.collections.new(name)
+    scene.collection.children.link(coll)
+    return coll
 
 class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
     bl_idname = "gpcurves.bake_gp_curves"
@@ -98,6 +96,9 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
                 ),
         )
     new_collection_name: bpy.props.StringProperty(name="New Collection Name")
+    remove_previous_collection: bpy.props.BoolProperty(name="Remove Previous Collection if Empty", default=True)
+    temp_hash=""
+    temp_name=""
 
     @classmethod
     def poll(cls, context):
@@ -105,6 +106,12 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
         return ob and ob.type == 'GPENCIL'
 
     def invoke(self, context, event):
+        ob = context.object
+        props = ob.data.gpcurves_gp_props
+
+        self.temp_hash=generate_random()
+        self.temp_name=self.new_collection_name="%s_%s_%s" % (bake_name, ob.name, self.temp_hash)
+        
         return context.window_manager.invoke_props_dialog(self)
 
     def draw(self, context):
@@ -113,9 +120,19 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
 
         layout = self.layout
 
+        if props.bake_hash and props.bake_collection:
+            box=layout.box()
+            col=box.column(align=True)
+            col.label(text="Previous Bake", icon="INFO")
+            col.label(text="Hash : %s" % props.bake_hash)
+            col.label(text="Collection : %s" % props.bake_collection.name)
+            col.prop(self, "remove_previous_collection")
+
+        layout.separator()
+
         layout.prop(self, "collection_mode", text="")
         if self.collection_mode=="NEW":
-            layout.prop(self, "new_collection_name", text="", icon="OUTLINER_COLLECTION")
+            layout.prop(self, "new_collection_name", text="", icon="COLLECTION_NEW")
         else:
             layout.prop(props, "bake_collection", text="")
 
@@ -134,9 +151,25 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
         # Remove previous
         if props.bake_hash:
             remove_bake(props.bake_hash)
+        if self.remove_previous_collection:
+            if props.bake_hash and props.bake_collection:
+                remove_collection_if_empty(props.bake_collection)
 
-        props.bake_hash=generate_random()
-        bake_gp_to_curves(ob.data, props.bake_collection, context.scene)
+        # New hash
+        props.bake_hash=self.temp_hash
+
+        # Create new coll if needed
+        if self.collection_mode=="NEW":
+            if not self.new_collection_name:
+                name=self.temp_name
+            else:
+                name=self.new_collection_name
+            coll=create_collection(self.new_collection_name, context.scene)
+            props.bake_collection=coll
+        else:
+            coll=props.bake_collection
+
+        bake_gp_to_curves(ob.data, coll, context.scene)
         return {'FINISHED'}
 
 
