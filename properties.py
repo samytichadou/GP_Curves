@@ -25,7 +25,10 @@ class GPCURVES_PR_curve_properties(bpy.types.PropertyGroup):
                 ('SPECIFICS', 'Specifics', ""),
                 ),
         )
-    specific_layers: bpy.props.StringProperty(name="Specific Layers")
+    specific_layers: bpy.props.StringProperty(
+        name="Specific Layers",
+        description="GP Layer(s) name(s) separated by comma",    
+    )
 
 class GPCURVES_PR_scene_properties(bpy.types.PropertyGroup):
     gpcurves_process: bpy.props.BoolProperty(name="GP Curves Process", update=gpcurves_process_update)
