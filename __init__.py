@@ -36,6 +36,7 @@ from . import   (
     properties,
     gui,
     curves_handler,
+    layer_selector_operator,
 )
 
 
@@ -46,8 +47,10 @@ def register():
     properties.register()
     gui.register()
     curves_handler.register()
+    layer_selector_operator.register()
 
 def unregister():
     properties.unregister()
     gui.unregister()
     curves_handler.unregister()
+    layer_selector_operator.unregister()

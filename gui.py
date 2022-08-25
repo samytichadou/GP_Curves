@@ -42,12 +42,13 @@ class GPCURVES_PT_curve_panel(bpy.types.Panel):
         layout = self.layout
         layout.active = props.is_gpcurves
 
-        layout.prop(props, "gp")
-        layout.prop(props, "layer_mode")
-        sub=layout.row()
+        layout.prop(props, "gp", text="GP Datas")
+        layout.prop(props, "layer_mode", text="Mode")
+        sub=layout.row(align=True)
         if not props.layer_mode=="SPECIFICS":
             sub.enabled=False
-        sub.prop(props, "specific_layers")
+        sub.prop(props, "specific_layers", text="Layer(s)")
+        sub.operator("gpcurves.add_layer_menu_caller", text="", icon="ADD")
 
 
 # auto profile topbar
