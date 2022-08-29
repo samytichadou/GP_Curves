@@ -6,9 +6,9 @@ TODO
 - [x] bake operator logic
 - [x] layer selector for bake op
 - [x] update bake operator
-- [_] frame range bake options
-- [_] descriptions for op and props
-- [_] optimize handler if no change in gp
-- [_] optimize handler if curve not seen/rendered in gp
-- [_] simplify curve options
-- [_] curve model logic
+- [ ] frame range bake options
+- [ ] descriptions for op and props
+- [ ] optimize handler if no change in gp
+- [ ] optimize handler if curve not seen/rendered in gp
+- [ ] simplify curve options
+- [ ] curve model logic
