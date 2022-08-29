@@ -199,6 +199,29 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class GPCURVES_OT_update_bake(bpy.types.Operator):
+    bl_idname = "gpcurves.update_bake"
+    bl_label = "Update Existing Bake"
+    bl_options = {'REGISTER','UNDO','INTERNAL'}
+
+    @classmethod
+    def poll(cls, context):
+        ob = context.object
+        if ob.type == 'GPENCIL':
+            if ob.data.gpcurves_gp_props.bake_hash:
+                return True
+
+    def execute(self, context):
+        ob=context.object
+        props=ob.data.gpcurves_gp_props
+
+        remove_bake(props.bake_hash)
+
+        bake_gp_to_curves(ob.data, props.bake_collection, context.scene)
+
+        return {'FINISHED'}
+
+
 class GPCURVES_OT_remove_bake(bpy.types.Operator):
     bl_idname = "gpcurves.remove_bake"
     bl_label = "Remove Bake"
@@ -245,8 +268,10 @@ class GPCURVES_OT_remove_bake(bpy.types.Operator):
 ### REGISTER ---
 def register():
     bpy.utils.register_class(GPCURVES_OT_bake_gp_curves)
+    bpy.utils.register_class(GPCURVES_OT_update_bake)
     bpy.utils.register_class(GPCURVES_OT_remove_bake)
 
 def unregister():
     bpy.utils.unregister_class(GPCURVES_OT_bake_gp_curves)
+    bpy.utils.unregister_class(GPCURVES_OT_update_bake)
     bpy.utils.unregister_class(GPCURVES_OT_remove_bake)

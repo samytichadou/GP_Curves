@@ -24,7 +24,9 @@ class GPCURVES_PT_gp_panel(bpy.types.Panel):
         box=layout.box()
         if props.bake_hash:
             col=box.column(align=True)
-            col.label(text="Previous Bake", icon="INFO")
+            row=col.row()
+            row.label(text="Previous Bake", icon="INFO")
+            row.operator('gpcurves.update_bake', text="", icon="FILE_REFRESH")
             col.label(text="Hash : %s" % props.bake_hash)
             col.label(text="Collection : %s" % props.bake_collection.name)
             if props.layer_mode=="ALL":
@@ -66,8 +68,8 @@ class GPCURVES_PT_curve_panel(bpy.types.Panel):
         props = ob.data.gpcurves_curve_props
 
         layout = self.layout
-        if props.is_gpcurves or props.bake_hash:
-            layout.active
+        if not props.is_gpcurves and not props.bake_hash:
+            layout.active=False
 
         if props.bake_hash:
             layout.label(text="Baked from : %s" % props.gp.name)
