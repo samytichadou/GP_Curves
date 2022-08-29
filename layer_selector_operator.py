@@ -60,15 +60,19 @@ class GPCURVES_OT_add_layer(bpy.types.Operator):
         if ob.type=="CURVE":
             props = ob.data.gpcurves_curve_props
             layer_field = props.specific_layers
+
+            if layer_field and not layer_field.strip().endswith(","):
+                props.specific_layers += ","
+            props.specific_layers += self.layer_name
+
         # From GP Object bake operator
         elif ob.type=="GPENCIL":
             props = ob.data.gpcurves_gp_props
             layer_field = props.temp_specific_layers
 
-        if layer_field and not layer_field.strip().endswith(","):
-            props.temp_specific_layers += ","
-
-        props.temp_specific_layers += self.layer_name
+            if layer_field and not layer_field.strip().endswith(","):
+                props.temp_specific_layers += ","
+            props.temp_specific_layers += self.layer_name
 
         context.area.tag_redraw()
 
