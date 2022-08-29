@@ -34,6 +34,8 @@ class GPCURVES_PR_greasepencil_properties(bpy.types.PropertyGroup):
         description="GP Layer(s) name(s) separated by comma",    
     )
 
+    parent_bake_object: bpy.props.PointerProperty(type = bpy.types.Object, name="Baked Curves Parent")
+
     bake_hash: bpy.props.StringProperty(name="Bake Hash")
 
 class GPCURVES_PR_curve_properties(bpy.types.PropertyGroup):

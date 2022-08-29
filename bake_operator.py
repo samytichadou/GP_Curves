@@ -29,7 +29,15 @@ def create_hide_keyframes(ob, hide, group):
         group=group,
     )
 
-def bake_gp_to_curves(gp_datas, target_coll, scene):
+def copy_transforms(ob_from, ob_to):
+    ob_to.location = ob_from.location
+    ob_to.rotation_euler = ob_from.rotation_euler
+    ob_to.rotation_quaternion = ob_from.rotation_quaternion
+    ob_to.rotation_mode = ob_from.rotation_mode
+    ob_to.scale = ob_from.scale
+
+def bake_gp_to_curves(gp_object, target_coll, scene):
+    gp_datas=gp_object.data
     gp_name=gp_datas.name
     props=gp_datas.gpcurves_gp_props
     old_frame=scene.frame_current
@@ -45,6 +53,9 @@ def bake_gp_to_curves(gp_datas, target_coll, scene):
         for frame in layer.frames:
             ob_name="%s_%s" % (ob_base_name, str(frame.frame_number).zfill(5))
             new_object=create_curve_object(ob_name, target_coll)
+
+            #copy_transforms(gp_object, new_object)
+            new_object.parent=gp_object
 
             curve_props=new_object.data.gpcurves_curve_props
             curve_props.bake_hash=props.bake_hash
@@ -198,7 +209,7 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
             props.bake_collection=coll
         else:
             coll=props.bake_collection
-        bake_gp_to_curves(ob.data, coll, scn)
+        bake_gp_to_curves(ob, coll, scn)
 
         return {'FINISHED'}
 
@@ -221,7 +232,7 @@ class GPCURVES_OT_update_bake(bpy.types.Operator):
 
         remove_bake(props.bake_hash)
 
-        bake_gp_to_curves(ob.data, props.bake_collection, context.scene)
+        bake_gp_to_curves(ob, props.bake_collection, context.scene)
 
         return {'FINISHED'}
 
