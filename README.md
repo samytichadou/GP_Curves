@@ -9,3 +9,4 @@ TODO
 - [_] descriptions for op and props
 - [_] optimize handler if no change in gp
 - [_] optimize handler if curve not seen/rendered in gp
+- [_] simplify curve options
