@@ -32,6 +32,7 @@ def create_hide_keyframes(ob, hide, group):
 def bake_gp_to_curves(gp_datas, target_coll, scene):
     gp_name=gp_datas.name
     props=gp_datas.gpcurves_gp_props
+    old_frame=scene.frame_current
 
     layer_list=c_h.get_layer_list(props, gp_datas)
 
@@ -65,6 +66,8 @@ def bake_gp_to_curves(gp_datas, target_coll, scene):
             # Keyframe end
             create_hide_keyframes(new_object, False, bake_name)
             previous_object=new_object
+
+    scene.frame_current=old_frame
 
 def remove_bake(hash):
     for ob in bpy.data.objects:
@@ -165,6 +168,7 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
 
     def execute(self, context):
         ob = context.object
+        scn = context.scene
         props = ob.data.gpcurves_gp_props
 
         # Remove previous
@@ -194,8 +198,8 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
             props.bake_collection=coll
         else:
             coll=props.bake_collection
+        bake_gp_to_curves(ob.data, coll, scn)
 
-        bake_gp_to_curves(ob.data, coll, context.scene)
         return {'FINISHED'}
 
 
