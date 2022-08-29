@@ -170,6 +170,22 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
 
         layout.separator()
 
+        layout.label(text="Object to get properties/modifiers from :")
+        layout.prop(props, "temp_object_properties_parent", text="")
+        if props.temp_object_properties_parent:
+            if props.temp_object_properties_parent.type != "CURVE":
+                msg="Not a curve, some properties/modifiers will be ignored"
+                icon="ERROR"
+            else:
+                msg="Curve object used"
+                icon="CHECKMARK"
+        else:
+            msg="No object used"
+            icon="ERROR"
+        layout.label(text=msg, icon=icon)
+
+        layout.separator()
+
         layout.prop(self, "layer_mode", text="Mode")
         sub=layout.row(align=True)
         if not self.layer_mode=="SPECIFICS":
@@ -195,7 +211,7 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
         props.bake_collection=props.temp_bake_collection
         props.layer_mode=self.layer_mode
         props.specific_layers=props.temp_specific_layers
-
+        props.object_properties_parent=props.temp_object_properties_parent
         # New hash
         props.bake_hash=self.temp_hash
 

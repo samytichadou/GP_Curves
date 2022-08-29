@@ -29,6 +29,11 @@ class GPCURVES_PT_gp_panel(bpy.types.Panel):
             row.operator('gpcurves.update_bake', text="", icon="FILE_REFRESH")
             col.label(text="Hash : %s" % props.bake_hash)
             col.label(text="Collection : %s" % props.bake_collection.name)
+            if props.object_properties_parent:
+                parent = props.object_properties_parent.name
+            else:
+                parent = "None"
+            col.label(text="Parent Object : %s" % parent)
             if props.layer_mode=="ALL":
                 layers="All"
             elif props.layer_mode=="VISIBLE":
