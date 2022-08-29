@@ -6,9 +6,16 @@ class GPCURVES_MT_add_layer_menu(bpy.types.Menu):
 
     def draw(self, context):
         ob = context.object
-        props = ob.data.gpcurves_curve_props
-        gp = props.gp
-        layer_list = props.specific_layers.split(",")
+        # From Curve Object
+        if ob.type=="CURVE":
+            props = ob.data.gpcurves_curve_props
+            gp = props.gp
+            layer_list = props.specific_layers.split(",")
+        # From GP Object bake operator
+        elif ob.type=="GPENCIL":
+            props = ob.data.gpcurves_gp_props
+            gp = ob.data
+            layer_list = props.temp_specific_layers.split(",")
 
         layout = self.layout
         for layer in gp.layers:
@@ -27,8 +34,10 @@ class GPCURVES_OT_add_layer_menu_caller(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         ob = context.object
-        gp = ob.data.gpcurves_curve_props.gp
-        return ob and gp
+        if ob.type=="GPENCIL":
+            return True
+        elif ob.type=="CURVE":
+            return ob.data.gpcurves_curve_props.gp
 
     def execute(self, context):
         bpy.ops.wm.call_menu(name="GPCURVES_MT_add_layer_menu")
@@ -47,13 +56,19 @@ class GPCURVES_OT_add_layer(bpy.types.Operator):
 
     def execute(self, context):
         ob = context.object
-        props = ob.data.gpcurves_curve_props
-        layer_field = props.specific_layers
+        # From Curve object
+        if ob.type=="CURVE":
+            props = ob.data.gpcurves_curve_props
+            layer_field = props.specific_layers
+        # From GP Object bake operator
+        elif ob.type=="GPENCIL":
+            props = ob.data.gpcurves_gp_props
+            layer_field = props.temp_specific_layers
 
         if layer_field and not layer_field.strip().endswith(","):
-            props.specific_layers += ","
+            props.temp_specific_layers += ","
 
-        props.specific_layers += self.layer_name
+        props.temp_specific_layers += self.layer_name
 
         context.area.tag_redraw()
 

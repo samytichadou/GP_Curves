@@ -106,13 +106,11 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
             ('SPECIFICS', 'Specific(s) GP layer(s)', ""),
             ),
     )
-    specific_layers: bpy.props.StringProperty(
-        name="Specific Layers",
-        description="GP Layer(s) name(s) separated by comma",    
-    )
 
     temp_hash=""
     temp_name=""
+
+    old_layers=None
 
     @classmethod
     def poll(cls, context):
@@ -124,6 +122,7 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
         props = ob.data.gpcurves_gp_props
 
         props.temp_bake_collection=props.bake_collection
+        props.temp_specific_layers=props.specific_layers
 
         self.temp_hash=generate_random()
         self.temp_name=self.new_collection_name="%s_%s_%s" % (bake_name, ob.name, self.temp_hash)
@@ -161,7 +160,8 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
         sub=layout.row(align=True)
         if not self.layer_mode=="SPECIFICS":
             sub.enabled=False
-        sub.prop(self, "specific_layers", text="Layer(s)")
+        sub.prop(props, "temp_specific_layers", text="Layer(s)")
+        sub.operator("gpcurves.add_layer_menu_caller", text="", icon="ADD")
 
     def execute(self, context):
         ob = context.object
@@ -179,7 +179,7 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
         # Pass new properties
         props.bake_collection=props.temp_bake_collection
         props.layer_mode=self.layer_mode
-        props.specific_layers=self.specific_layers
+        props.specific_layers=props.temp_specific_layers
 
         # New hash
         props.bake_hash=self.temp_hash

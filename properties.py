@@ -29,6 +29,10 @@ class GPCURVES_PR_greasepencil_properties(bpy.types.PropertyGroup):
         name="Specific Layers",
         description="GP Layer(s) name(s) separated by comma",    
     )
+    temp_specific_layers: bpy.props.StringProperty(
+        name="Specific Layers",
+        description="GP Layer(s) name(s) separated by comma",    
+    )
 
     bake_hash: bpy.props.StringProperty(name="Bake Hash")
 

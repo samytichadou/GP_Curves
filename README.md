@@ -4,6 +4,7 @@ TODO
 - [x] handler toggler
 - [x] layer selector from curve
 - [x] bake operator logic
+- [x] layer selector for bake op
 - [_] update bake operator
 - [_] frame range bake options
 - [_] descriptions for op and props
