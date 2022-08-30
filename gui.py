@@ -70,10 +70,10 @@ class GPCURVES_PT_curve_panel(bpy.types.Panel):
     def draw_header(self, context):
         ob = context.object
         props = ob.data.gpcurves_curve_props
-        if not props.bake_hash:
-            self.layout.prop(props, "is_gpcurves", text="")
-        else:
+        if props.bake_hash:
             self.layout.label(text="", icon="OUTLINER_OB_GREASEPENCIL")
+        else:
+            self.layout.prop(props, "is_gpcurves", text="")
 
     def draw(self, context):
         ob = context.object
@@ -87,6 +87,7 @@ class GPCURVES_PT_curve_panel(bpy.types.Panel):
             layout.label(text="Baked from : %s" % props.gp.name)
             layout.label(text="Hash : %s" % props.bake_hash)
             return
+
         layout.prop(props, "gp", text="GP Datas")
         layout.prop(props, "layer_mode", text="Mode")
         sub=layout.row(align=True)
