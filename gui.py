@@ -28,7 +28,14 @@ class GPCURVES_PT_gp_panel(bpy.types.Panel):
             row.label(text="Previous Bake", icon="INFO")
             row.operator('gpcurves.update_bake', text="", icon="FILE_REFRESH")
             col.label(text="Hash : %s" % props.bake_hash)
-            col.label(text="Collection : %s" % props.bake_collection.name)
+            row=col.row(align=True)
+            row.label(text="Collection : %s" % props.bake_collection.name)
+
+            row.separator()
+            row.prop(props.bake_collection, "hide_select", text="", emboss=False)
+            row.prop(props.bake_collection, "hide_viewport", text="", emboss=False)
+            row.prop(props.bake_collection, "hide_render", text="", emboss=False)
+
             if props.object_properties_parent:
                 parent = props.object_properties_parent.name
             else:
