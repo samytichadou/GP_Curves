@@ -1,3 +1,4 @@
+from tracemalloc import start
 import bpy
 import random
 
@@ -67,41 +68,80 @@ def bake_gp_to_curves(gp_object, target_coll, scene):
 
     layer_list=c_h.get_layer_list(props, gp_datas)
 
+    if props.frame_range=="ALL":
+        start_frame=0
+        end_frame=-1
+    elif props.frame_range=="SCENE":
+        start_frame=scene.frame_start
+        end_frame=scene.frame_end
+    elif props.frame_range=="CUSTOM":
+        start_frame=props.custom_start_frame
+        end_frame=props.custom_end_frame
+
     # Per layer
     for layer in layer_list:
         ob_base_name="%s_%s" % (gp_name, layer.info)
 
         previous_object=None
+        previous_start=None
+
+# TODO fix frame range issues (start before start_frame)
 
         for frame in layer.frames:
-            ob_name="%s_%s" % (ob_base_name, str(frame.frame_number).zfill(5))
-            new_object=create_curve_object(ob_name, target_coll)
 
-            #copy_transforms(gp_object, new_object)
-            if props.object_properties_parent:
-                copy_modifiers(props.object_properties_parent, new_object)
-            new_object.parent=gp_object
+            # Check frame range
+            chk_start=chk_end=True
+            if frame.frame_number<start_frame:
+                chk_start=False
+            elif frame.frame_number>end_frame: 
+                if end_frame!=-1:
+                    chk_end=False
 
-            curve_props=new_object.data.gpcurves_curve_props
-            curve_props.bake_hash=props.bake_hash
-            curve_props.gp=gp_datas
+            if chk_end:
+                ob_name="%s_%s" % (ob_base_name, str(frame.frame_number).zfill(5))
+                new_object=create_curve_object(ob_name, target_coll)
 
-            for stroke in frame.strokes:
-                c_h.create_spline_from_stroke(new_object, stroke)
+                #copy_transforms(gp_object, new_object)
+                if props.object_properties_parent:
+                    copy_modifiers(props.object_properties_parent, new_object)
+                new_object.parent=gp_object
 
-            # Keyframe start
-            if frame.frame_number>scene.frame_start:
-                scene.frame_current=scene.frame_start
-            create_hide_keyframes(new_object, True, bake_name)
+                curve_props=new_object.data.gpcurves_curve_props
+                curve_props.bake_hash=props.bake_hash
+                curve_props.gp=gp_datas
 
-            # Keyframe Previous object
-            scene.frame_current=frame.frame_number
-            if previous_object:
-                create_hide_keyframes(previous_object, True, bake_name)
+                for stroke in frame.strokes:
+                    c_h.create_spline_from_stroke(new_object, stroke)
+
+                # Keyframe start
+                if frame.frame_number!=start_frame:
+                    scene.frame_current=start_frame
+
+                # If not, frame_current still from previous frame
+                create_hide_keyframes(new_object, True, bake_name)
+
+                scene.frame_current=frame.frame_number
+
+                # Keyframe Previous object
+                if previous_object:
+                    create_hide_keyframes(previous_object, True, bake_name)
+                
+                # Keyframe end
+                create_hide_keyframes(new_object, False, bake_name)
+                previous_object=new_object
+                previous_start=chk_start
             
-            # Keyframe end
-            create_hide_keyframes(new_object, False, bake_name)
-            previous_object=new_object
+            # elif not chk_end:
+            #     scene.frame_current=end_frame+1
+            #     # Keyframe Previous object
+            #     if previous_object:
+            #         create_hide_keyframes(previous_object, True, bake_name)
+
+            # check for bad previous obj start
+            if not previous_start and not chk_start:
+                # Remove previous obj
+                bpy.data.objects.remove(previous_object, do_unlink=True)
+                previous_object=None
 
     scene.frame_current=old_frame
 
@@ -212,6 +252,8 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
             row.active=False
         row.prop(self, "custom_start_frame")
         row.prop(self, "custom_end_frame")
+
+        layout.separator()
 
         layout.label(text="Object to get properties/modifiers from :")
         layout.prop(props, "temp_object_properties_parent", text="")
