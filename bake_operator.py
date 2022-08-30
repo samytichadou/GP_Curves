@@ -60,6 +60,8 @@ def copy_modifiers(ob_from, ob_to):
                 except KeyError:
                     pass
 
+# TODO use frame_list logic
+
 def get_layer_frame_list(layer, props, scene):
     if props.frame_range=="ALL":
         start_frame=0
@@ -74,6 +76,7 @@ def get_layer_frame_list(layer, props, scene):
     frame_list=[]
     n=1
     for frame in layer.frames:
+        # TODO filter out of range frames and set proper start end
         try:
             next=layer.frames[n]
         except IndexError:
@@ -108,8 +111,6 @@ def bake_gp_to_curves(gp_object, target_coll, scene):
         previous_start=None
 
         scene.frame_current=start_frame
-
-# TODO fix frame range issues (start before start_frame)
 
         for frame in layer.frames:
 
