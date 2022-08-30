@@ -149,6 +149,17 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
     temp_hash=""
     temp_name=""
 
+    frame_range: bpy.props.EnumProperty(
+        name="Frame Range",
+        items=(
+            ('ALL', 'All GP Frames', ""),
+            ('SCENE', 'Scene Frame Range', ""),
+            ('CUSTOM', 'Custom Frame Range', ""),
+            ),
+    )
+    custom_start_frame: bpy.props.IntProperty(name="Start", min=0)
+    custom_end_frame: bpy.props.IntProperty(name="End", min=0, default=250)
+
     old_layers=None
 
     @classmethod
@@ -195,6 +206,13 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
 
         layout.separator()
 
+        layout.prop(self, "frame_range")
+        row=layout.row(align=True)
+        if self.frame_range!="CUSTOM":
+            row.active=False
+        row.prop(self, "custom_start_frame")
+        row.prop(self, "custom_end_frame")
+
         layout.label(text="Object to get properties/modifiers from :")
         layout.prop(props, "temp_object_properties_parent", text="")
         if props.temp_object_properties_parent:
@@ -237,6 +255,9 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
         props.layer_mode=self.layer_mode
         props.specific_layers=props.temp_specific_layers
         props.object_properties_parent=props.temp_object_properties_parent
+        props.frame_range=self.frame_range
+        props.custom_start_frame=self.custom_start_frame
+        props.custom_end_frame=self.custom_end_frame
         # New hash
         props.bake_hash=self.temp_hash
 

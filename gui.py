@@ -48,6 +48,13 @@ class GPCURVES_PT_gp_panel(bpy.types.Panel):
             else:
                 layers=props.specific_layers
             col.label(text="Layers : %s" % layers)
+            if props.frame_range=="ALL":
+                f_range="All GP Frames"
+            elif props.frame_range=="SCENE":
+                f_range="Scene Frame Range"
+            else:
+                f_range="%i - %i" % (props.custom_start_frame, props.custom_end_frame)
+            col.label(text="Frame Range : %s" % f_range)
         else:
             box.label(text="No Bake", icon="INFO")
 

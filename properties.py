@@ -25,6 +25,18 @@ class GPCURVES_PR_greasepencil_properties(bpy.types.PropertyGroup):
             ('SPECIFICS', 'Specific(s) GP layer(s)', ""),
             ),
     )
+    
+    frame_range: bpy.props.EnumProperty(
+        name="Frame Range",
+        items=(
+            ('ALL', 'All GP Frames', ""),
+            ('SCENE', 'Scene Frame Range', ""),
+            ('CUSTOM', 'Custom Frame Range', ""),
+            ),
+    )
+    custom_start_frame: bpy.props.IntProperty(name="Start", min=0)
+    custom_end_frame: bpy.props.IntProperty(name="End", min=0, default=250)
+
     specific_layers: bpy.props.StringProperty(
         name="Specific Layers",
         description="GP Layer(s) name(s) separated by comma",    
