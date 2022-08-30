@@ -9,10 +9,11 @@ TODO
 - [x] update bake operator
 - [x] parent bake children to gp (transform)+
 - [x] bake collection actions (hide...)
+- [x] curve model logic
 - [ ] frame range bake options
 - [ ] descriptions for op and props
 - [ ] optimize handler if no change in gp
 - [ ] optimize handler if curve not seen/rendered in gp
 - [ ] simplify curve options
-- [ ] curve model logic
 - [ ] select all bake objects
+- [ ] update from curve model object
