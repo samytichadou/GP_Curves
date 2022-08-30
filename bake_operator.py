@@ -36,6 +36,29 @@ def copy_transforms(ob_from, ob_to):
     ob_to.rotation_mode = ob_from.rotation_mode
     ob_to.scale = ob_from.scale
 
+def copy_modifiers(ob_from, ob_to):
+    for mod in ob_from.modifiers:
+        try:
+            new_mod = ob_to.modifiers.new(name=mod.name, type=mod.type)
+        except TypeError:
+            print("GPCURVES --- modifier %s avoided")
+            break
+        
+        # Copy Modifier Properties
+        for p in mod.bl_rna.properties:
+            try:
+                setattr(new_mod, "%s" % p.identifier, getattr(mod, "%s" % p.identifier))
+            except AttributeError:
+                pass
+        
+        # Deal with Geo Nodes
+        if mod.type=='NODES':
+            for input in mod.node_group.inputs:
+                try:
+                    new_mod[input.identifier]=mod[input.identifier]
+                except KeyError:
+                    pass
+
 def bake_gp_to_curves(gp_object, target_coll, scene):
     gp_datas=gp_object.data
     gp_name=gp_datas.name
@@ -55,6 +78,8 @@ def bake_gp_to_curves(gp_object, target_coll, scene):
             new_object=create_curve_object(ob_name, target_coll)
 
             #copy_transforms(gp_object, new_object)
+            if props.object_properties_parent:
+                copy_modifiers(props.object_properties_parent, new_object)
             new_object.parent=gp_object
 
             curve_props=new_object.data.gpcurves_curve_props

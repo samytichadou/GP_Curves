@@ -54,7 +54,7 @@ def gp_curve_handler(scene):
     for ob in scene.objects:
         if ob.type=="CURVE":
             props=ob.data.gpcurves_curve_props
-            if props.is_gpcurves and not props.bake_hash:
+            if props.is_gpcurves and not props.bake_hash and not props.is_properties_parent:
                 if props.gp:
                     print("curving from %s to %s" % (props.gp.name, ob.name))
                     create_curves_from_gp_active_frame(ob, props.gp, scene.frame_current)
