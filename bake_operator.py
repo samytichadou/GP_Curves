@@ -60,6 +60,28 @@ def copy_modifiers(ob_from, ob_to):
                 except KeyError:
                     pass
 
+def get_layer_frame_list(layer, props, scene):
+    if props.frame_range=="ALL":
+        start_frame=0
+        end_frame=-1
+    elif props.frame_range=="SCENE":
+        start_frame=scene.frame_start
+        end_frame=scene.frame_end
+    elif props.frame_range=="CUSTOM":
+        start_frame=props.custom_start_frame
+        end_frame=props.custom_end_frame
+
+    frame_list=[]
+    n=1
+    for frame in layer.frames:
+        try:
+            next=layer.frames[n]
+        except IndexError:
+            next=None
+        frame_list.append((frame.strokes, frame.frame_number, layer.frames[n].frame_number))
+        n+=1
+    return frame_list
+
 def bake_gp_to_curves(gp_object, target_coll, scene):
     gp_datas=gp_object.data
     gp_name=gp_datas.name
@@ -85,6 +107,8 @@ def bake_gp_to_curves(gp_object, target_coll, scene):
         previous_object=None
         previous_start=None
 
+        scene.frame_current=start_frame
+
 # TODO fix frame range issues (start before start_frame)
 
         for frame in layer.frames:
@@ -98,6 +122,8 @@ def bake_gp_to_curves(gp_object, target_coll, scene):
                     chk_end=False
 
             if chk_end:
+
+                # Create object
                 ob_name="%s_%s" % (ob_base_name, str(frame.frame_number).zfill(5))
                 new_object=create_curve_object(ob_name, target_coll)
 
@@ -110,15 +136,13 @@ def bake_gp_to_curves(gp_object, target_coll, scene):
                 curve_props.bake_hash=props.bake_hash
                 curve_props.gp=gp_datas
 
+                # Create spline
                 for stroke in frame.strokes:
                     c_h.create_spline_from_stroke(new_object, stroke)
 
                 # Keyframe start
-                if frame.frame_number!=start_frame:
-                    scene.frame_current=start_frame
-
-                # If not, frame_current still from previous frame
-                create_hide_keyframes(new_object, True, bake_name)
+                if frame.frame_number!=start_frame or chk_start:
+                    create_hide_keyframes(new_object, True, bake_name)
 
                 scene.frame_current=frame.frame_number
 
@@ -130,12 +154,6 @@ def bake_gp_to_curves(gp_object, target_coll, scene):
                 create_hide_keyframes(new_object, False, bake_name)
                 previous_object=new_object
                 previous_start=chk_start
-            
-            # elif not chk_end:
-            #     scene.frame_current=end_frame+1
-            #     # Keyframe Previous object
-            #     if previous_object:
-            #         create_hide_keyframes(previous_object, True, bake_name)
 
             # check for bad previous obj start
             if not previous_start and not chk_start:
