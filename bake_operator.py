@@ -78,10 +78,10 @@ def get_layer_frame_list(layer, props, scene):
     for frame in layer.frames:
         # TODO filter out of range frames and set proper start end
         try:
-            next=layer.frames[n]
+            next=layer.frames[n].frame_number
         except IndexError:
             next=None
-        frame_list.append((frame.strokes, frame.frame_number, layer.frames[n].frame_number))
+        frame_list.append((frame.strokes, frame.frame_number, next))
         n+=1
     return frame_list
 
