@@ -34,7 +34,7 @@ class GPCURVES_PR_greasepencil_properties(bpy.types.PropertyGroup):
             ('CUSTOM', 'Custom Frame Range', ""),
             ),
     )
-    custom_start_frame: bpy.props.IntProperty(name="Start", min=0)
+    custom_start_frame: bpy.props.IntProperty(name="Start", min=0, default=1)
     custom_end_frame: bpy.props.IntProperty(name="End", min=0, default=250)
 
     specific_layers: bpy.props.StringProperty(

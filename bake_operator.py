@@ -60,29 +60,72 @@ def copy_modifiers(ob_from, ob_to):
                 except KeyError:
                     pass
 
-# TODO use frame_list logic
+def copy_datas(ob_from, ob_to):
+    datas_from=ob_from.data 
+    datas_to=ob_to.data
+    # Copy Datas Properties
+    for p in datas_from.bl_rna.properties:
+        try:
+            setattr(datas_to, "%s" % p.identifier, getattr(datas_from, "%s" % p.identifier))
+        except AttributeError:
+            pass
 
-def get_layer_frame_list(layer, props, scene):
+def get_start_end_frame(props, scene):
     if props.frame_range=="ALL":
         start_frame=0
-        end_frame=-1
+        end_frame=1048574
     elif props.frame_range=="SCENE":
         start_frame=scene.frame_start
         end_frame=scene.frame_end
-    elif props.frame_range=="CUSTOM":
+    else:
         start_frame=props.custom_start_frame
         end_frame=props.custom_end_frame
+    return start_frame, end_frame
 
+def get_layer_frame_list(layer, props, scene):
+    start_frame, end_frame = get_start_end_frame(props, scene)
     frame_list=[]
     n=1
     for frame in layer.frames:
-        # TODO filter out of range frames and set proper start end
+        chk_no_end=False
+        # No strokes
+        if not frame.strokes:
+            continue
+        #print("start %i" % frame.frame_number)
+        
+        # Get next frame
         try:
             next=layer.frames[n].frame_number
+            #print("next %i" % next)
         except IndexError:
-            next=None
-        frame_list.append((frame.strokes, frame.frame_number, next))
+            next=1048574
+            chk_no_end=True
         n+=1
+
+        # Filter frames
+        start=frame.frame_number
+        end=next
+
+        if start>=start_frame and start<=end_frame:
+            pass
+        elif end>=start_frame and end<=end_frame:
+            pass
+        elif start<=start_frame and end>=end_frame:
+            pass
+        elif start<=start_frame and end<=end_frame and end>=start_frame:
+            pass
+        else:
+            continue
+
+        if start<start_frame:
+            start=start_frame
+        if end>end_frame:
+            end=None
+
+        if chk_no_end:
+            end=None
+        frame_list.append((frame.strokes, start, end))
+
     return frame_list
 
 def bake_gp_to_curves(gp_object, target_coll, scene):
@@ -93,74 +136,41 @@ def bake_gp_to_curves(gp_object, target_coll, scene):
 
     layer_list=c_h.get_layer_list(props, gp_datas)
 
-    if props.frame_range=="ALL":
-        start_frame=0
-        end_frame=-1
-    elif props.frame_range=="SCENE":
-        start_frame=scene.frame_start
-        end_frame=scene.frame_end
-    elif props.frame_range=="CUSTOM":
-        start_frame=props.custom_start_frame
-        end_frame=props.custom_end_frame
+    start_frame, end_frame = get_start_end_frame(props, scene)
 
     # Per layer
     for layer in layer_list:
         ob_base_name="%s_%s" % (gp_name, layer.info)
 
-        previous_object=None
-        previous_start=None
+        #print(layer.info)
+        frame_list=get_layer_frame_list(layer, props, scene)
+        #print(frame_list)
 
-        scene.frame_current=start_frame
+        for f in frame_list:
+            # Create object
+            ob_name="%s_%s" % (ob_base_name, str(f[1]).zfill(5))
+            new_object=create_curve_object(ob_name, target_coll)
 
-        for frame in layer.frames:
+            if props.object_properties_parent:
+                copy_modifiers(props.object_properties_parent, new_object)
+                copy_datas(props.object_properties_parent, new_object)
+            new_object.parent=gp_object
 
-            # Check frame range
-            chk_start=chk_end=True
-            if frame.frame_number<start_frame:
-                chk_start=False
-            elif frame.frame_number>end_frame: 
-                if end_frame!=-1:
-                    chk_end=False
+            curve_props=new_object.data.gpcurves_curve_props
+            curve_props.bake_hash=props.bake_hash
+            curve_props.gp=gp_datas
 
-            if chk_end:
-
-                # Create object
-                ob_name="%s_%s" % (ob_base_name, str(frame.frame_number).zfill(5))
-                new_object=create_curve_object(ob_name, target_coll)
-
-                #copy_transforms(gp_object, new_object)
-                if props.object_properties_parent:
-                    copy_modifiers(props.object_properties_parent, new_object)
-                new_object.parent=gp_object
-
-                curve_props=new_object.data.gpcurves_curve_props
-                curve_props.bake_hash=props.bake_hash
-                curve_props.gp=gp_datas
-
-                # Create spline
-                for stroke in frame.strokes:
-                    c_h.create_spline_from_stroke(new_object, stroke)
-
-                # Keyframe start
-                if frame.frame_number!=start_frame or chk_start:
-                    create_hide_keyframes(new_object, True, bake_name)
-
-                scene.frame_current=frame.frame_number
-
-                # Keyframe Previous object
-                if previous_object:
-                    create_hide_keyframes(previous_object, True, bake_name)
-                
-                # Keyframe end
-                create_hide_keyframes(new_object, False, bake_name)
-                previous_object=new_object
-                previous_start=chk_start
-
-            # check for bad previous obj start
-            if not previous_start and not chk_start:
-                # Remove previous obj
-                bpy.data.objects.remove(previous_object, do_unlink=True)
-                previous_object=None
+            for stroke in f[0]:
+                c_h.create_spline_from_stroke(new_object, stroke)
+            # Keyframes
+            if f[1]>start_frame:
+                scene.frame_current=start_frame
+                create_hide_keyframes(new_object, True, bake_name)
+            scene.frame_current=f[1]
+            create_hide_keyframes(new_object, False, bake_name)
+            if f[2] is not None:
+                scene.frame_current=f[2]
+                create_hide_keyframes(new_object, True, bake_name)
 
     scene.frame_current=old_frame
 
@@ -216,7 +226,7 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
             ('CUSTOM', 'Custom Frame Range', ""),
             ),
     )
-    custom_start_frame: bpy.props.IntProperty(name="Start", min=0)
+    custom_start_frame: bpy.props.IntProperty(name="Start", min=0, default=1)
     custom_end_frame: bpy.props.IntProperty(name="End", min=0, default=250)
 
     old_layers=None
@@ -230,7 +240,13 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
         ob = context.object
         props = ob.data.gpcurves_gp_props
 
+        # Set temp as previous bake
         props.temp_bake_collection=props.bake_collection
+        self.frame_range=props.frame_range
+        self.custom_start_frame=props.custom_start_frame
+        self.custom_end_frame=props.custom_end_frame
+        props.temp_object_properties_parent=props.object_properties_parent
+        self.layer_mode=props.layer_mode
         props.temp_specific_layers=props.specific_layers
 
         self.temp_hash=generate_random()
@@ -302,6 +318,12 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
         scn = context.scene
         props = ob.data.gpcurves_gp_props
 
+        # Check for wrong custom range
+        if self.frame_range=="CUSTOM":
+            if self.custom_start_frame>self.custom_end_frame:
+                self.report({'WARNING'}, "Invalid Custom Frame Range")
+                return {'FINISHED'}
+
         # Remove previous
         if props.bake_hash:
             remove_bake(props.bake_hash)
@@ -334,6 +356,8 @@ class GPCURVES_OT_bake_gp_curves(bpy.types.Operator):
             coll=props.bake_collection
         bake_gp_to_curves(ob, coll, scn)
 
+        self.report({'INFO'}, "Bake Done")
+
         return {'FINISHED'}
 
 
@@ -356,6 +380,8 @@ class GPCURVES_OT_update_bake(bpy.types.Operator):
         remove_bake(props.bake_hash)
 
         bake_gp_to_curves(ob, props.bake_collection, context.scene)
+
+        self.report({'INFO'}, "Bake Updated")
 
         return {'FINISHED'}
 
@@ -399,6 +425,8 @@ class GPCURVES_OT_remove_bake(bpy.types.Operator):
                 remove_collection_if_empty(props.bake_collection)
 
         props.bake_hash=""
+
+        self.report({'INFO'}, "Bake Removed")
 
         return {'FINISHED'}
 
