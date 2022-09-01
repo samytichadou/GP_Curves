@@ -14,7 +14,7 @@ TODO
 - [x] get props from guide props
 - [ ] descriptions for op and props
 - [ ] optimize handler if no change in gp
-- [ ] optimize handler if curve not seen/rendered in gp
+- [ ] optimize handler if curve not seen/rendered in gp (coll hidden or deactivated)
 - [ ] simplify curve options
 - [ ] select all bake objects
 - [ ] select guide object
