@@ -56,11 +56,11 @@ def gp_curve_handler(scene):
             props=ob.data.gpcurves_curve_props
             if props.is_gpcurves and not props.bake_hash:
                 if props.gp:
-                    print("curving from %s to %s" % (props.gp.name, ob.name))
+                    print(f"GP CURVES --- frame {scene.frame_current} : curving from {props.gp.name} to {ob.name}")
                     create_curves_from_gp_active_frame(ob, props.gp, scene.frame_current)
     end=time.time()
     exec_time=end-start
-    print("handler executed in : %f" % exec_time)
+    print(f"GP CURVES --- handler executed in : {exec_time}")
 
 @persistent
 def gp_curve_startup_handler(scene):
