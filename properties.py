@@ -1,18 +1,15 @@
 import bpy
 
-from .curves_handler import gp_curve_handler
+from .curves_handler import set_handlers, remove_handlers
 
 
 def gpcurves_process_update(self, context):
     if self.gpcurves_process:
-        bpy.app.handlers.depsgraph_update_post.append(gp_curve_handler)
-        bpy.app.handlers.frame_change_post.append(gp_curve_handler)
-        print("GPCURVES -- GP Curves Process ON")
+        set_handlers()
+        print("GPCURVES --- GP Curves Process ON")
     else:
-        bpy.app.handlers.depsgraph_update_post.remove(gp_curve_handler)
-        bpy.app.handlers.frame_change_post.remove(gp_curve_handler)
-        print("GPCURVES -- GP Curves Process OFF")
-    return
+        remove_handlers()
+        print("GPCURVES --- GP Curves Process OFF")
 
 class GPCURVES_PR_greasepencil_properties(bpy.types.PropertyGroup):
     bake_collection: bpy.props.PointerProperty(type = bpy.types.Collection, name="Baked Curves Collection")
@@ -71,7 +68,6 @@ class GPCURVES_PR_curve_properties(bpy.types.PropertyGroup):
 
 class GPCURVES_PR_scene_properties(bpy.types.PropertyGroup):
     gpcurves_process: bpy.props.BoolProperty(name="GP Curves Process", update=gpcurves_process_update)
-
 
 ### REGISTER ---
 def register():
