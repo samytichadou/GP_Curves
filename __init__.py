@@ -22,7 +22,7 @@ bl_info = {
     "name": "GP Curves",
     "description": "Link 3D Curve to Grease Pencil animated datas",
     "author": "Samy Tichadou (tonton)",
-    "version": (0, 4, 0),
+    "version": (0, 4, 1),
     "blender": (3, 0, 0),
     "location": "",
     "wiki_url": "https://github.com/samytichadou/GP_Curves/blob/master/README.md",

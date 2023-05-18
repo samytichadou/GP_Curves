@@ -5,11 +5,11 @@ from .curves_handler import set_handlers, remove_handlers
 
 def gpcurves_process_update(self, context):
     if self.gpcurves_process:
-        set_handlers()
         print("GPCURVES --- GP Curves Process ON")
+        set_handlers()
     else:
-        remove_handlers()
         print("GPCURVES --- GP Curves Process OFF")
+        remove_handlers()
 
 class GPCURVES_PR_greasepencil_properties(bpy.types.PropertyGroup):
     bake_collection: bpy.props.PointerProperty(type = bpy.types.Collection, name="Baked Curves Collection")

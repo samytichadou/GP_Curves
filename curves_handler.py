@@ -227,7 +227,8 @@ def load_post_handler(scene):
 
 @persistent
 def load_pre_handler(scene):
-    remove_handlers()
+    if bpy.context.scene.gpcurves_scene_props.gpcurves_process:
+        remove_handlers()
 
 ### REGISTER ---
 
