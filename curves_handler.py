@@ -4,6 +4,15 @@ import time
 
 from .preferences import get_addon_preferences
 
+def get_addon_version(name="GP Curves"):
+    import addon_utils
+    for addon in addon_utils.modules()[:]:
+        if addon.bl_info['name']==name:
+            return addon.bl_info.get('version')
+    return None
+
+version=get_addon_version()
+
 def remove_existing_splines(curve_object):
     for spline in curve_object.data.splines:
         curve_object.data.splines.remove(spline)
@@ -97,7 +106,7 @@ def framechange_handler(scene):
     if debug: #DEBUG
         start=time.perf_counter() #DEBUG
         print() #DEBUG
-        print("GPCURVES ------ FRAME HANDLER ------") #DEBUG
+        print(f"GPCURVES ------ FRAME HANDLER ------ v{version}") #DEBUG
 
     for ob in get_gp_linked_curves(scn):
         props=ob.data.gpcurves_curve_props
@@ -119,7 +128,7 @@ def depsgraph_handler(scene):
     if debug: #DEBUG
         start=time.perf_counter() #DEBUG
         print() #DEBUG
-        print("GPCURVES ------ DEPSGRAPH HANDLER ------") #DEBUG
+        print(f"GPCURVES ------ DEPSGRAPH HANDLER ------ v{version}") #DEBUG
 
     chk_handler=False
     if context.active_object:
@@ -150,7 +159,7 @@ def render_init_handler(scene):
     if debug: #DEBUG
         start=time.perf_counter() #DEBUG
         print() #DEBUG
-        print("GPCURVES ------ RENDER INIT HANDLER ------") #DEBUG
+        print(f"GPCURVES ------ RENDER INIT HANDLER ------ v{version}") #DEBUG
 
     for handler in bpy.app.handlers.depsgraph_update_post:
         if "depsgraph_handler"==handler.__name__:
@@ -171,7 +180,7 @@ def render_end_handler(scene):
     if debug: #DEBUG
         start=time.perf_counter() #DEBUG
         print() #DEBUG
-        print("GPCURVES ------ RENDER END HANDLER ------") #DEBUG
+        print(f"GPCURVES ------ RENDER END HANDLER ------ v{version}") #DEBUG
 
     bpy.app.handlers.depsgraph_update_post.append(depsgraph_handler)
     print("GPCURVES --- Setting depsgraph handler")
