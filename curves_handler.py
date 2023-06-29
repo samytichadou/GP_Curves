@@ -71,10 +71,11 @@ def create_curves_from_gp_active_frame(curve_object, gp_object, frame, debug=Fal
                     stroke_list.append(stroke)
                 break
 
+    remove_existing_splines(curve_object)
+
     if chk_frame:
         if debug: #DEBUG
             print(f"GPCURVES --- Removing splines from {curve_object.name}") #DEBUG
-        remove_existing_splines(curve_object)
         if debug: #DEBUG
             print("GPCURVES --- Creating strokes") #DEBUG
         for stroke in stroke_list:
